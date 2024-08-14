@@ -407,9 +407,6 @@ const positionInit=[
     }
 ]
 
-
-// window.addEventListener('load', Init);
-
 function Init(){
 
     //******************************************************************************************************//
@@ -428,8 +425,6 @@ function Init(){
     textArray[1].text = "NIVEAU:"+level;
     textArray[2].text = "VIES:"+lives;
 
-    ennemiDisplay(positionInit);
-
     const spriteSheet = new createjs.SpriteSheet(vaisseauSprite);
     ship = new createjs.Sprite(spriteSheet,"stand");
     ship.x = 480;
@@ -437,6 +432,8 @@ function Init(){
     ship.scaleX = 0.8;
     ship.scaleY = 0.7;
     stage.addChild(ship);
+    
+    ennemiDisplay(positionInit);
 
 //*******************************************************************************************************************//
 //                                  mise en place de la routine principale de gestion                                //
@@ -470,29 +467,6 @@ function Init(){
         }
         stage.update();
     })
-    
-}
-
-function stopAnimation (){
-    // Remove the tick handler
-    createjs.Ticker.removeEventListener("tick", tickHandler);
-
-    // Clear the stage
-    stage.removeAllChildren();
-    
-    // Optional: clear the canvas
-    var canvas = stage.canvas;
-    var ctx = canvas.getContext("2d");
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    
-    // Clean up the stage
-    stage.enableDOMEvents(false);
-    stage = null;
-    for(let w=0;w<11;w++){
-        sprite[w] = null;
-        
-    }
-    stage.update();
 }
 
 function alienRemover(){
@@ -540,7 +514,6 @@ function alienMove(){
         }
         timerA = 0;
     }
-    
 }
 
 function shootBul(x){
@@ -592,9 +565,7 @@ function spaceShipMove(){
             spaceShip = false;
             stage.removeChild(flyingSocer);
         }
-
     }
-
 }
 
 function colisions(){
@@ -660,4 +631,3 @@ function textDisplay(dataText,dataCont,textLine,xData){
 }
 
 Init();
-export default Init();
