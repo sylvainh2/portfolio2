@@ -12,11 +12,11 @@ let shootShip = true;
 let spaceShip = false;
 let bullet, flyingSocer;
 let speedBullet = 5;
-let speedSpace = 1;
+let speedSpace = 2;
 let textArray = [];
 
-let frame = 1/60;
-let frameR = 60;
+let frame = 1/120;
+let frameR = 120;
 let y1 = 100;
 let y2 = 150;
 let y3 = 200;
@@ -26,9 +26,6 @@ let score = 0;
 let level = 1;
 let lives = 3;
 
-const contScore=[];
-const contLive=[];
-const contLevel=[];
 const scoreText=[];
 const liveText=[];
 const levelText=[];
@@ -417,9 +414,9 @@ function Init(){
     window.addEventListener("keydown",keyDown);
     window.addEventListener("keyup",keyUp);
 
-    textDisplay(contScore, scoreText, "SCORE:", 80);
-    textDisplay(contLevel, levelText, "NIVEAU:", 450);
-    textDisplay(contLive, liveText, "VIES:", 800);
+    textDisplay(scoreText, "SCORE:", 80);
+    textDisplay(levelText, "NIVEAU:", 450);
+    textDisplay(liveText, "VIES:", 800);
 
     textArray[0].text = "SCORE:"+score;
     textArray[1].text = "NIVEAU:"+level;
@@ -449,11 +446,11 @@ function Init(){
         colisions();
 
         if (touche[37]){
-            ship.x -= 5;
+            ship.x -= 2.5;
             if (ship.x<10) ship.x = 10;
         }
         if (touche[39]){
-            ship.x += 5;
+            ship.x += 2.5;
             if (ship.x > 940) ship.x = 940;
         }
         if (touche[32]){
@@ -618,15 +615,13 @@ function ennemiDisplay(positionInit){
     };
 }
 
-function textDisplay(dataText,dataCont,textLine,xData){
-    dataCont = new createjs.Container();
+function textDisplay(dataText,textLine,xData){
     dataText = new createjs.Text(textLine,"bold 20px Arial","black");
     dataText.textAlign="left";
     dataText.textBaseline="middle";
-    dataCont.x = xData;
-    dataCont.y = 20;
-    dataCont.addChild(dataText);
-    stage.addChild(dataCont);
+    dataText.x = xData;
+    dataText.y = 20;
+    stage.addChild(dataText);
     textArray.push(dataText);
 }
 
