@@ -11,15 +11,17 @@ let sensFlag = false;
 let shootShip = true;
 let spaceShip = false;
 let shootAlien = false;
+let refresh = false;
 let bullet, flyingSocer;
 let speedBullet = 10;
 let speedAlienBullet = 7;
 let speedSpace = 3;
 let textArray = [];
 let alienBul = [];
+let scTextDisplay = [];
 
-let frame = 1/60;
-let frameR = 60;
+let frame = 1/120;
+let frameR = 120;
 let y1 = 100;
 let y2 = 150;
 let y3 = 200;
@@ -28,6 +30,7 @@ let y5 = 300;
 let score = 0;
 let level = 1;
 let lives = 3;
+let timeSC;
 
 const scoreText=[];
 const liveText=[];
@@ -447,6 +450,13 @@ function Init(){
         moveBul();
         spaceShipMove();
         colisions();
+        if(Math.floor(Math.random()*650)===50){
+            spaceShipBuild(vaisseauMereSprite);
+        }
+        if(timeSC && timeSC===frameR){
+            stage.removeChild(scTextDisplay);
+            timeSC = null;
+        }
 
         if (touche[37]){
             ship.x -= 5;
@@ -466,13 +476,8 @@ function Init(){
             console.log(alienArray[alienArray.length-1].y);
         }
         stage.update();
+        timeSC +=1;
     })
-}
-
-function alienRemover(){
-    let position = Math.floor(Math.random()*alienArray.length);
-    stage.removeChild(alienArray[position]);
-    alienArray.splice(position,1);
 }
 
 function keyDown(event){
@@ -490,6 +495,12 @@ function alienMove(){
 
     timerA += 1;
     if(timerA%(frameR/2) === 0){
+        if(refresh){
+            ennemiDisplay(positionInit);
+            refresh = false;
+            sens = 1;
+            sensFlag = false;
+        }
         alienArray.map((alienData)=> {
             alienData.x += (10*sens);
             if (alienData.x > (stage.canvas.width-60) || alienData.x < 20){
@@ -505,8 +516,7 @@ function alienMove(){
                 if (alienDat.y > 490) {
                     // Game Over
                     createjs.Ticker.removeEventListener("tick");
-                    alert("Game Over");
-                    return;
+                    gameOver();
                 }
             })
             sens *= (-1);
@@ -554,7 +564,7 @@ function spaceShipBuild(vaisseauMereSprite){
     if (!spaceShip){
         const spriteSheet = new createjs.SpriteSheet(vaisseauMereSprite);
         flyingSocer = new createjs.Sprite(spriteSheet,"stand");
-        flyingSocer.x = 900;
+        flyingSocer.x = 1000;
         flyingSocer.y = 50;
         flyingSocer.scaleX = 0.8;
         flyingSocer.scaleY = 0.7;
@@ -566,7 +576,7 @@ function spaceShipBuild(vaisseauMereSprite){
 function spaceShipMove(){
     if (spaceShip){
         flyingSocer.x -= speedSpace;
-        if (flyingSocer.x <10){
+        if (flyingSocer.x <-60){
             spaceShip = false;
             stage.removeChild(flyingSocer);
         }
@@ -590,16 +600,28 @@ function colisions(){
                     level += 1;
                     textArray[1].text="NIVEAU:"+level;
                     textArray[2].text="VIES:"+lives;
+                    refresh = true;
 
-                    ennemiDisplay(positionInit);
                 }
             }
         }
         if (spaceShip){
             console.log(spaceShip,flyingSocer.x,flyingSocer.y,bullet.x,bullet.y);
             if ((flyingSocer.x+5) < bullet.x && (flyingSocer.x+65) > bullet.x && flyingSocer.y < bullet.y && flyingSocer.y+20 > bullet.y){
+                let sc=0;
+                if(flyingSocer.x>=370 && flyingSocer.x<=570)sc=300;
+                if((flyingSocer.x>=170 && flyingSocer.x<370) || (flyingSocer.x>570 && flyingSocer.x<=770))sc=200;
+                if((flyingSocer.x>=-60 && flyingSocer.x<170) || (flyingSocer.x>770 && flyingSocer.x<1000))sc=100;
+                textArray[0].text = "SCORE:"+(score+sc);
+                let scText = flyingSocer.x+30;
                 stage.removeChild(flyingSocer);
                 stage.removeChild(bullet);
+                scTextDisplay = new createjs.Text(sc,"bold 12px arial","red");
+                scTextDisplay.x = scText-15;
+                scTextDisplay.y = 60;
+                stage.addChild(scTextDisplay);
+                timeSC = 0;
+                score += sc;
                 shootShip = true;
                 spaceShip = false;
             }
@@ -631,6 +653,22 @@ function textDisplay(dataText,textLine,xData){
     dataText.y = 20;
     stage.addChild(dataText);
     textArray.push(dataText);
+}
+
+function gameOver(){
+    alert("Game Over");
+    reset();
+}
+
+function reset(){
+    score = 0;
+    niveau = 1;
+    vies = 3;
+    ship.x = 480;
+    timerA = 0;
+    sens = 1;
+    sensFlag = false;
+    ennemiDisplay(positionInit);
 }
 
 Init();
