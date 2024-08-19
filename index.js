@@ -10,13 +10,16 @@ let sens = 1;
 let sensFlag = false;
 let shootShip = true;
 let spaceShip = false;
+let shootAlien = false;
 let bullet, flyingSocer;
-let speedBullet = 5;
-let speedSpace = 2;
+let speedBullet = 10;
+let speedAlienBullet = 7;
+let speedSpace = 3;
 let textArray = [];
+let alienBul = [];
 
-let frame = 1/120;
-let frameR = 120;
+let frame = 1/60;
+let frameR = 60;
 let y1 = 100;
 let y2 = 150;
 let y3 = 200;
@@ -35,7 +38,7 @@ let alien1Sprite = {
     images:["./assets/alien1.png"],
     frames:{width:60,height:45,regx:-30,regy:45},
     animations:{
-        run:[0,1,"run",frame],
+        run:[0,1,"run",frame*2],
         stand0:0,
         stand1:1
     },
@@ -45,14 +48,14 @@ let alien2Sprite = {
     images:["./assets/alien2.png"],
     frames:{width:60,height:45,count:2,regx:-30,regy:45},
     animations:{
-        run:[0,1,"run",frame]
+        run:[0,1,"run",frame*2]
     }
 };
 let alien3Sprite = {
     images:["./assets/alien3.png"],
     frames:{width:60,height:45,count:2,regx:-30,regy:45},
     animations:{
-        run:[0,1,"run",frame]
+        run:[0,1,"run",frame*2]
     }
 };
 let vaisseauSprite = {
@@ -436,8 +439,8 @@ function Init(){
 //                                  mise en place de la routine principale de gestion                                //
 //*******************************************************************************************************************//
 
-    createjs.Ticker.useRAF=true;
-    createjs.Ticker.framerate = frameR;
+    // createjs.Ticker.useRAF=true;
+    createjs.Ticker.setFPS(frameR);
     createjs.Ticker.addEventListener("tick",()=>
     {
         alienMove();
@@ -446,11 +449,11 @@ function Init(){
         colisions();
 
         if (touche[37]){
-            ship.x -= 2.5;
+            ship.x -= 5;
             if (ship.x<10) ship.x = 10;
         }
         if (touche[39]){
-            ship.x += 2.5;
+            ship.x += 5;
             if (ship.x > 940) ship.x = 940;
         }
         if (touche[32]){
@@ -486,9 +489,9 @@ function keyUp(event){
 function alienMove(){
 
     timerA += 1;
-    if(timerA%frameR === 0){
+    if(timerA%(frameR/2) === 0){
         alienArray.map((alienData)=> {
-            alienData.x += (5*sens);
+            alienData.x += (10*sens);
             if (alienData.x > (stage.canvas.width-60) || alienData.x < 20){
                 if(!sensFlag){
                     sensFlag = true;
@@ -539,6 +542,11 @@ function alienShootBul(){
 }
 
 function moveAlienBul(){
+    if(shootAlien){
+        for(let i=0; i<alienShootBul.length; i++){
+            alienBul[i] += speedAlienBullet;
+        }
+    }
 
 }
 
