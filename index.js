@@ -20,8 +20,9 @@ let textArray = [];
 let alienBul = [];
 let scTextDisplay = [];
 
-let frame = 1/120;
 let frameR = 120;
+let frameS = 120;
+let frame = 1/frameS;
 let y1 = 100;
 let y2 = 150;
 let y3 = 200;
@@ -494,7 +495,7 @@ function keyUp(event){
 function alienMove(){
 
     timerA += 1;
-    if(timerA%(frameR/2) === 0){
+    if(timerA%(frameS/2) === 0){
         if(refresh){
             ennemiDisplay(positionInit);
             refresh = false;
