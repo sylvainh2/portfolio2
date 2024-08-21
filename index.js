@@ -700,6 +700,11 @@ function alienBulletColision(){
                     gameOver();
                 }
             }
+            if(alienShootBullet[i].y>ship.y+15){
+                stage.removeChild(alienShootBullet[i]);
+                alienShootBullet.splice(i,1);
+                if(alienShootBullet.length===0)shootAlien = false;
+            }
         }
     }
 
