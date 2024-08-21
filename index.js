@@ -1,9 +1,7 @@
 
 const myCanvas = document.getElementById("demoCanvas");
 const stage = new createjs.Stage(myCanvas);
-let tickHandler;
 let timerA=0;
-let multi=1;
 let touche=[];
 let alienArray=[];
 let sens = 1;
@@ -19,9 +17,10 @@ let speedSpace = 3;
 let textArray = [];
 let alienBul = [];
 let scTextDisplay = [];
+let alienShootBullet = [];
 
-let frameR = 120;
-let frameS = 120;
+let frameR = 60;
+let frameS = 60;
 let frame = 1/frameS;
 let y1 = 100;
 let y2 = 150;
@@ -451,7 +450,10 @@ function Init(){
         moveBul();
         spaceShipMove();
         colisions();
-        if(Math.floor(Math.random()*650)===50){
+        alienBulletMove();
+        alienBulletColision();
+
+        if(Math.floor(Math.random()*700)===50){
             spaceShipBuild(vaisseauMereSprite);
         }
         if(timeSC && timeSC===frameR){
@@ -470,12 +472,12 @@ function Init(){
         if (touche[32]){
             shootBul(ship.x+25);
         }
-        if(touche[13]){
-            spaceShipBuild(vaisseauMereSprite);
-        }
-        if(touche[107]){
-            console.log(alienArray[alienArray.length-1].y);
-        }
+        // if(touche[13]){
+        //     spaceShipBuild(vaisseauMereSprite);
+        // }
+        // if(touche[107]){
+        //     console.log(alienArray[alienArray.length-1].y);
+        // }
         stage.update();
         timeSC +=1;
     })
@@ -548,13 +550,19 @@ function moveBul(){
     }
 }
 
-function alienShootBul(){
-
+function alienShootBul(xAlien,yAlien){
+    const bulletAlien = new createjs.Shape();
+    bulletAlien.graphics.beginFill("green").drawRect(0,0,4,10);
+    bulletAlien.x = xAlien + 28;
+    bulletAlien.y = yAlien + 45;
+    stage.addChild(bulletAlien);
+    alienShootBullet.push(bulletAlien);
+    shootAlien = true;
 }
 
-function moveAlienBul(){
+function alienBulletMove(){
     if(shootAlien){
-        for(let i=0; i<alienShootBul.length; i++){
+        for(let i=0; i<alienShootBullet.length; i++){
             alienBul[i] += speedAlienBullet;
         }
     }
@@ -669,7 +677,32 @@ function reset(){
     timerA = 0;
     sens = 1;
     sensFlag = false;
+    if(shootAlien){
+        alienShootBullet.map((data)=>{
+            stage.removeChild(data);
+        })
+    }
+    shootAlien = false;
+    if(!shootShip){
+        stage.removeChild(bullet);
+    }
+    shootShip = true;
+    alienShootBullet = [];
     ennemiDisplay(positionInit);
+}
+
+function alienBulletColision(){
+    if(shootAlien){
+        for(let i=0; i<alienShootBullet.length; i++){
+            if((alienShootBullet[i].x>ship.x-25 && alienShootBullet[i].x<ship.x+25) && alienShootBullet[i].y>ship.y+10){
+                vies -= 1;
+                if(vies === 0){
+                    gameOver();
+                }
+            }
+        }
+    }
+
 }
 
 Init();
