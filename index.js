@@ -18,6 +18,7 @@ let textArray = [];
 let alienBul = [];
 let scTextDisplay = [];
 let alienShootBullet = [];
+let ship = [];
 
 let frameR = 60;
 let frameS = 60;
@@ -30,6 +31,7 @@ let y5 = 300;
 let score = 0;
 let level = 1;
 let lives = 3;
+let shootSpeed = 8000;
 let timeSC;
 
 const scoreText=[];
@@ -415,7 +417,6 @@ function Init(){
     //******************************************************************************************************//
     //                                   création de la flotte d'aliens                                     //
     //******************************************************************************************************//
-    let ship;
 
     window.addEventListener("keydown",keyDown);
     window.addEventListener("keyup",keyUp);
@@ -449,6 +450,7 @@ function Init(){
         alienMove();
         moveBul();
         spaceShipMove();
+        alienShoot();
         colisions();
         alienBulletMove();
         alienBulletColision();
@@ -552,7 +554,7 @@ function moveBul(){
 
 function alienShootBul(xAlien,yAlien){
     const bulletAlien = new createjs.Shape();
-    bulletAlien.graphics.beginFill("green").drawRect(0,0,4,10);
+    bulletAlien.graphics.beginFill("blue").drawRect(0,0,4,15);
     bulletAlien.x = xAlien + 28;
     bulletAlien.y = yAlien + 45;
     stage.addChild(bulletAlien);
@@ -562,8 +564,9 @@ function alienShootBul(xAlien,yAlien){
 
 function alienBulletMove(){
     if(shootAlien){
+        console.log("MOVE");
         for(let i=0; i<alienShootBullet.length; i++){
-            alienBul[i] += speedAlienBullet;
+            alienShootBullet[i].y += speedAlienBullet;
         }
     }
 
@@ -594,7 +597,7 @@ function spaceShipMove(){
 
 function colisions(){
     if (!shootShip){
-        for(let i = 0;i <= alienArray.length-1; i++){
+        for(let i = 0; i <= alienArray.length-1; i++){
             const alienData = alienArray[i];
             if ((alienData.x+5)<bullet.x && (alienData.x+40)>bullet.x && alienData.y<=bullet.y && alienData.y+25>=bullet.y){
                 score += alienArray[i].scr;
@@ -670,9 +673,13 @@ function gameOver(){
 }
 
 function reset(){
+    console.log("reset");
     score = 0;
-    niveau = 1;
-    vies = 3;
+    level = 1;
+    lives = 3;
+    textArray[0].text = "SCORE:"+score;
+    textArray[1].text = "NIVEAU:"+level;
+    textArray[2].text = "VIES:"+lives;
     ship.x = 480;
     timerA = 0;
     sens = 1;
@@ -688,19 +695,39 @@ function reset(){
     }
     shootShip = true;
     alienShootBullet = [];
+    if(alienArray.length>0){
+        alienArray.map((data,index)=>{
+            stage.removeChild(data);
+            alienArray.splice(index,1);
+        })
+    }
+    if(touche.length>0){
+        console.log(touche.length);
+        touche.map((data,index)=>{
+            touche[index] = false;
+        })
+    }
     ennemiDisplay(positionInit);
 }
 
 function alienBulletColision(){
     if(shootAlien){
         for(let i=0; i<alienShootBullet.length; i++){
-            if((alienShootBullet[i].x>ship.x-25 && alienShootBullet[i].x<ship.x+25) && alienShootBullet[i].y>ship.y+10){
-                vies -= 1;
-                if(vies === 0){
+            console.log(alienShootBullet[i].x, alienShootBullet[i].y);
+            console.log("SHIP:",ship.x,ship.y)
+            if((alienShootBullet[i].x>ship.x && alienShootBullet[i].x<ship.x+50) && alienShootBullet[i].y>ship.y){
+                lives -= 1;
+                textArray[2].text="VIES:"+lives;
+                stage.update();
+                if(lives === 0){
                     gameOver();
                 }
+                stage.removeChild(alienShootBullet[i]);
+                alienShootBullet.splice(i,1);
+                if(alienShootBullet.length===0)shootAlien = false;
             }
-            if(alienShootBullet[i].y>ship.y+15){
+            else if(alienShootBullet[i].y>535){
+                // console.log("SPLASH");
                 stage.removeChild(alienShootBullet[i]);
                 alienShootBullet.splice(i,1);
                 if(alienShootBullet.length===0)shootAlien = false;
@@ -708,6 +735,16 @@ function alienBulletColision(){
         }
     }
 
+}
+
+function alienShoot(){
+    alienArray.map((data)=>{
+        let shoot = Math.floor(Math.random()*shootSpeed);
+        if(shoot===50){
+            alienShootBul(data.x,data.y);
+        }
+
+    })
 }
 
 Init();
