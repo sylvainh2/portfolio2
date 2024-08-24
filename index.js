@@ -429,13 +429,7 @@ function Init(){
     textArray[1].text = "NIVEAU:"+level;
     textArray[2].text = "VIES:"+lives;
 
-    const spriteSheet = new createjs.SpriteSheet(vaisseauSprite);
-    ship = new createjs.Sprite(spriteSheet,"stand");
-    ship.x = 480;
-    ship.y = 520;
-    ship.scaleX = 0.8;
-    ship.scaleY = 0.7;
-    stage.addChild(ship);
+    createShip(480);
     
     ennemiDisplay(positionInit);
 
@@ -564,7 +558,6 @@ function alienShootBul(xAlien,yAlien){
 
 function alienBulletMove(){
     if(shootAlien){
-        console.log("MOVE");
         for(let i=0; i<alienShootBullet.length; i++){
             alienShootBullet[i].y += speedAlienBullet;
         }
@@ -606,7 +599,6 @@ function colisions(){
                 alienArray.splice(i,1);
                 shootShip = true;
                 textArray[0].text = "SCORE:"+score;
-                console.log("longueur:"+alienArray.length);
                 if (alienArray.length === 0){
                     lives += 1;
                     level += 1;
@@ -618,7 +610,6 @@ function colisions(){
             }
         }
         if (spaceShip){
-            console.log(spaceShip,flyingSocer.x,flyingSocer.y,bullet.x,bullet.y);
             if ((flyingSocer.x+5) < bullet.x && (flyingSocer.x+65) > bullet.x && flyingSocer.y < bullet.y && flyingSocer.y+20 > bullet.y){
                 let sc=0;
                 if(flyingSocer.x>=370 && flyingSocer.x<=570)sc=300;
@@ -696,13 +687,12 @@ function reset(){
     shootShip = true;
     alienShootBullet = [];
     if(alienArray.length>0){
-        alienArray.map((data,index)=>{
+        alienArray.map((data)=>{
             stage.removeChild(data);
-            alienArray.splice(index,1);
         })
+        alienArray = [];
     }
     if(touche.length>0){
-        console.log(touche.length);
         touche.map((data,index)=>{
             touche[index] = false;
         })
@@ -715,9 +705,10 @@ function alienBulletColision(){
         for(let i=0; i<alienShootBullet.length; i++){
             console.log(alienShootBullet[i].x, alienShootBullet[i].y);
             console.log("SHIP:",ship.x,ship.y)
-            if((alienShootBullet[i].x>ship.x && alienShootBullet[i].x<ship.x+50) && alienShootBullet[i].y>ship.y){
+            if((alienShootBullet[i].x>ship.x && alienShootBullet[i].x<ship.x+46) && alienShootBullet[i].y>ship.y){
                 lives -= 1;
                 textArray[2].text="VIES:"+lives;
+                waitTime();
                 stage.update();
                 if(lives === 0){
                     gameOver();
@@ -727,7 +718,6 @@ function alienBulletColision(){
                 if(alienShootBullet.length===0)shootAlien = false;
             }
             else if(alienShootBullet[i].y>535){
-                // console.log("SPLASH");
                 stage.removeChild(alienShootBullet[i]);
                 alienShootBullet.splice(i,1);
                 if(alienShootBullet.length===0)shootAlien = false;
@@ -745,6 +735,25 @@ function alienShoot(){
         }
 
     })
+}
+
+function waitTime(){
+    stage.removeEventListener("tick");
+    let shipX=ship.x;
+    stage.removeChild(ship);
+    setTimeout(()=>{
+        createShip(shipX);
+    },2000);
+}
+
+function createShip(dataX){
+    const spriteSheet = new createjs.SpriteSheet(vaisseauSprite);
+    ship = new createjs.Sprite(spriteSheet,"stand");
+    ship.x = dataX;
+    ship.y = 520;
+    ship.scaleX = 0.8;
+    ship.scaleY = 0.7;
+    stage.addChild(ship);
 }
 
 Init();
