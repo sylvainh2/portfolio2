@@ -10,6 +10,7 @@ let shootShip = true;
 let spaceShip = false;
 let shootAlien = false;
 let refresh = false;
+let pause = false;
 let bullet, flyingSocer;
 let speedBullet = 10;
 let speedAlienBullet = 7;
@@ -439,50 +440,22 @@ function Init(){
 
     // createjs.Ticker.useRAF=true;
     createjs.Ticker.setFPS(frameR);
-    createjs.Ticker.addEventListener("tick",()=>
-    {
-        alienMove();
-        moveBul();
-        spaceShipMove();
-        alienShoot();
-        colisions();
-        alienBulletMove();
-        alienBulletColision();
-
-        if(Math.floor(Math.random()*700)===50){
-            spaceShipBuild(vaisseauMereSprite);
-        }
-        if(timeSC && timeSC===frameR){
-            stage.removeChild(scTextDisplay);
-            timeSC = null;
-        }
-
-        if (touche[37]){
-            ship.x -= 5;
-            if (ship.x<10) ship.x = 10;
-        }
-        if (touche[39]){
-            ship.x += 5;
-            if (ship.x > 940) ship.x = 940;
-        }
-        if (touche[32]){
-            shootBul(ship.x+25);
-        }
-        // if(touche[13]){
-        //     spaceShipBuild(vaisseauMereSprite);
-        // }
-        // if(touche[107]){
-        //     console.log(alienArray[alienArray.length-1].y);
-        // }
-        stage.update();
-        timeSC +=1;
-    })
+    createjs.Ticker.addEventListener("tick",tickFunc);
 }
 
 function keyDown(event){
     let e = event.keyCode;
     console.log(e);
     touche[e]=true;
+    if (pause && touche[80]){
+        createjs.Ticker.addEventListener("tick",tickFunc);
+    }
+    if (!pause && touche[80]){
+        createjs.Ticker.removeEventListener("tick", tickFunc);
+    }
+    if(touche[80]){
+        pause = !pause;
+    }
 }
 
 function keyUp(event){
@@ -703,8 +676,6 @@ function reset(){
 function alienBulletColision(){
     if(shootAlien){
         for(let i=0; i<alienShootBullet.length; i++){
-            console.log(alienShootBullet[i].x, alienShootBullet[i].y);
-            console.log("SHIP:",ship.x,ship.y)
             if((alienShootBullet[i].x>ship.x && alienShootBullet[i].x<ship.x+46) && alienShootBullet[i].y>ship.y){
                 lives -= 1;
                 textArray[2].text="VIES:"+lives;
@@ -728,6 +699,7 @@ function alienBulletColision(){
 }
 
 function alienShoot(){
+    // mettre ici la fonction qui calcul shootSpeed en fonction du nb de vaisseaux restants
     alienArray.map((data)=>{
         let shoot = Math.floor(Math.random()*shootSpeed);
         if(shoot===50){
@@ -738,7 +710,6 @@ function alienShoot(){
 }
 
 function waitTime(){
-    stage.removeEventListener("tick");
     let shipX=ship.x;
     stage.removeChild(ship);
     setTimeout(()=>{
@@ -754,6 +725,45 @@ function createShip(dataX){
     ship.scaleX = 0.8;
     ship.scaleY = 0.7;
     stage.addChild(ship);
+}
+
+function tickFunc(){
+    alienMove();
+    moveBul();
+    spaceShipMove();
+    alienShoot();
+    colisions();
+    alienBulletMove();
+    alienBulletColision();
+
+    if(Math.floor(Math.random()*700)===50){
+        spaceShipBuild(vaisseauMereSprite);
+    }
+    if(timeSC && timeSC===frameR){
+        stage.removeChild(scTextDisplay);
+        timeSC = null;
+    }
+
+    if (touche[37]){
+        ship.x -= 5;
+        if (ship.x<10) ship.x = 10;
+    }
+    if (touche[39]){
+        ship.x += 5;
+        if (ship.x > 940) ship.x = 940;
+    }
+    if (touche[32]){
+        shootBul(ship.x+25);
+    }
+
+    // if(touche[13]){
+    //     spaceShipBuild(vaisseauMereSprite);
+    // }
+    // if(touche[107]){
+    //     console.log(alienArray[alienArray.length-1].y);
+    // }
+    stage.update();
+    timeSC +=1;
 }
 
 Init();
