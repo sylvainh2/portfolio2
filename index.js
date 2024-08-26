@@ -11,6 +11,8 @@ let spaceShip = false;
 let shootAlien = false;
 let refresh = false;
 let pause = false;
+let musicFlag = true;
+let soundFlag = true;
 let bullet, flyingSocer;
 let speedBullet = 10;
 let speedAlienBullet = 7;
@@ -39,6 +41,11 @@ const scoreText=[];
 const liveText=[];
 const levelText=[];
 
+const music = document.querySelector("#musique");
+music.volume = 0.1;
+const explode = document.querySelector("#explosion");
+const zap = document.querySelector("#tir");
+zap.volume = 0.2;
 
 let alien1Sprite = {
     images:["./assets/alien1.png"],
@@ -438,7 +445,6 @@ function Init(){
 //                                  mise en place de la routine principale de gestion                                //
 //*******************************************************************************************************************//
 
-    // createjs.Ticker.useRAF=true;
     createjs.Ticker.setFPS(frameR);
     createjs.Ticker.addEventListener("tick",tickFunc);
 }
@@ -449,12 +455,25 @@ function keyDown(event){
     touche[e]=true;
     if (pause && touche[80]){
         createjs.Ticker.addEventListener("tick",tickFunc);
+        music.play();
     }
     if (!pause && touche[80]){
         createjs.Ticker.removeEventListener("tick", tickFunc);
+        music.pause();
     }
     if(touche[80]){
         pause = !pause;
+    }
+    if (touche[77]){
+        if (musicFlag){
+            music.pause();
+        } else {
+            music.play();
+        }
+            musicFlag = !musicFlag
+    }
+    if (touche[83]){
+            soundFlag = !soundFlag
     }
 }
 
@@ -505,6 +524,7 @@ function shootBul(x){
         bullet.x = x - 2;
         bullet.y = 510;
         stage.addChild(bullet);
+        if(soundFlag)zap.play();
         shootShip = false;
     }
 }
@@ -632,12 +652,14 @@ function textDisplay(dataText,textLine,xData){
 }
 
 function gameOver(){
+    music.pause();
     alert("Game Over");
     reset();
 }
 
 function reset(){
     console.log("reset");
+    if(musicFlag)music.play();
     score = 0;
     level = 1;
     lives = 3;
@@ -712,6 +734,7 @@ function alienShoot(){
 function waitTime(){
     let shipX=ship.x;
     stage.removeChild(ship);
+    if(soundFlag)explode.play();
     setTimeout(()=>{
         createShip(shipX);
     },2000);
