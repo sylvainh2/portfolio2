@@ -13,6 +13,7 @@ let refresh = false;
 let pause = false;
 let musicFlag = true;
 let soundFlag = true;
+let shootAble = true;
 let bullet, flyingSocer;
 let speedBullet = 10;
 let speedAlienBullet = 7;
@@ -34,7 +35,7 @@ let y5 = 300;
 let score = 0;
 let level = 1;
 let lives = 3;
-let shootSpeed = 8000;
+let shootSpeed = 7800;
 let timeSC;
 
 const scoreText=[];
@@ -475,6 +476,13 @@ function keyDown(event){
     if (touche[83]){
             soundFlag = !soundFlag
     }
+    if (touche[107] && music.volume<0.9){
+        music.volume += 0.1;
+    }
+    if (touche[109] && music.volume>0.2){
+        music.volume -= 0.1;
+    }
+
 }
 
 function keyUp(event){
@@ -666,10 +674,10 @@ function reset(){
     textArray[0].text = "SCORE:"+score;
     textArray[1].text = "NIVEAU:"+level;
     textArray[2].text = "VIES:"+lives;
-    ship.x = 480;
     timerA = 0;
     sens = 1;
     sensFlag = false;
+    shootAble = true;
     if(shootAlien){
         alienShootBullet.map((data)=>{
             stage.removeChild(data);
@@ -721,9 +729,8 @@ function alienBulletColision(){
 }
 
 function alienShoot(){
-    // mettre ici la fonction qui calcul shootSpeed en fonction du nb de vaisseaux restants
     alienArray.map((data)=>{
-        let shoot = Math.floor(Math.random()*shootSpeed);
+        let shoot = Math.floor(Math.random()*(shootSpeed/(56-alienArray.length)+200));
         if(shoot===50){
             alienShootBul(data.x,data.y);
         }
@@ -732,11 +739,12 @@ function alienShoot(){
 }
 
 function waitTime(){
-    let shipX=ship.x;
-    stage.removeChild(ship);
+    shootAble = false;
+    ship.visible = false;
     if(soundFlag)explode.play();
     setTimeout(()=>{
-        createShip(shipX);
+        ship.visible = true;
+        shootAble = true;
     },2000);
 }
 
@@ -767,24 +775,18 @@ function tickFunc(){
         timeSC = null;
     }
 
-    if (touche[37]){
+    if (touche[37] && shootAble){
         ship.x -= 5;
         if (ship.x<10) ship.x = 10;
     }
-    if (touche[39]){
+    if (touche[39] && shootAble){
         ship.x += 5;
         if (ship.x > 940) ship.x = 940;
     }
-    if (touche[32]){
+    if (touche[32] && shootAble){
         shootBul(ship.x+25);
     }
 
-    // if(touche[13]){
-    //     spaceShipBuild(vaisseauMereSprite);
-    // }
-    // if(touche[107]){
-    //     console.log(alienArray[alienArray.length-1].y);
-    // }
     stage.update();
     timeSC +=1;
 }
