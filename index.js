@@ -14,6 +14,7 @@ let pause = false;
 let musicFlag = true;
 let soundFlag = true;
 let shootAble = true;
+let startFlag = false;
 let bullet, flyingSocer;
 let speedBullet = 10;
 let speedAlienBullet = 7;
@@ -423,33 +424,91 @@ const positionInit=[
 
 function Init(){
 
-    //******************************************************************************************************//
-    //                                   création de la flotte d'aliens                                     //
-    //******************************************************************************************************//
+    const container = new createjs.Container();
+    const menuCont = new createjs.Shape();
+    menuCont.graphics.beginFill("darkgrey").drawRect(-300,-200,600,400);
+    stage.addChild(menuCont);
+    const titre1 = new createjs.Text("","bold 30px Arial","red");
+    const titre2 = new createjs.Text("", "bold 20px Arial","black");
+    const ligne1 = new createjs.Text("", "bold 20px Arial","black");
+    const ligne2 = new createjs.Text("", "bold 20px Arial","black");
+    const ligne3 = new createjs.Text("", "bold 20px Arial","black");
+    const ligne4 = new createjs.Text("", "bold 20px Arial","black");
+    const ligne5 = new createjs.Text("", "bold 20px Arial","black");
+    const ligne6 = new createjs.Text("", "bold 20px Arial","black");
+    const containerClick = new createjs.Container();
+    const validCont = new createjs.Shape();
+    validCont.graphics.beginFill("lightgrey").drawRect(-150,-15,300,30);
+    containerClick.addEventListener("click",(e)=>{
+        stage.removeChild(container);
+        stage.update();
+        start();
+    });
+    container.addChild(menuCont,titre1,titre2,ligne1,ligne2,ligne3,ligne4,ligne5,containerClick);
+    containerClick.addChild(validCont,ligne6);
+    stage.addChild(container);
+    container.x = 500;
+    container.y = 275;
+    titre1.text = "SPACE INVADERS";
+    titre1.textAlign = "center";
+    titre1.y = -180;
+    titre2.text = "Action des touches";
+    titre2.textAlign = "center";
+    titre2.y = -140;
+    ligne1.text = "M ......... active/désactive la musique";
+    ligne1.y = -60;
+    ligne1.x = -250;
+    ligne2.text = "S ......... active/désactive les effets sonores";
+    ligne2.y = -30;
+    ligne2.x = -250;
+    ligne3.text = "+/- ....... augmente/baisse le volume de la musique";
+    ligne3.y = 0;
+    ligne3.x = -250;
+    ligne4.text = "<= / => ... deplacement gauche/droite";
+    ligne4.y = 30;
+    ligne4.x = -250;
+    ligne5.text = "Espace .... tir";
+    ligne5.y = 60;
+    ligne5.x = -250;
+    ligne6.text = "Commencer la partie";
+    validCont.y = 140;
+    ligne6.y = 130;
+    ligne6.textAlign = "center";
+    stage.update();
 
-    window.addEventListener("keydown",keyDown);
-    window.addEventListener("keyup",keyUp);
 
-    textDisplay(scoreText, "SCORE:", 80);
-    textDisplay(levelText, "NIVEAU:", 450);
-    textDisplay(liveText, "VIES:", 800);
-
-    textArray[0].text = "SCORE:"+score;
-    textArray[1].text = "NIVEAU:"+level;
-    textArray[2].text = "VIES:"+lives;
-
-    createShip(480);
-    
-    ennemiDisplay(positionInit);
-
-//*******************************************************************************************************************//
-//                                  mise en place de la routine principale de gestion                                //
-//*******************************************************************************************************************//
-
-    createjs.Ticker.setFPS(frameR);
-    createjs.Ticker.addEventListener("tick",tickFunc);
 }
 
+function start(){
+        //*****************************************************************************************************//
+        //                                  création de la flotte d'aliens                                     //
+        //*****************************************************************************************************//
+
+        console.log("debut");
+        window.addEventListener("keydown",keyDown);
+        window.addEventListener("keyup",keyUp);
+    
+        textDisplay(scoreText, "SCORE:", 80);
+        textDisplay(levelText, "NIVEAU:", 450);
+        textDisplay(liveText, "VIES:", 800);
+    
+        textArray[0].text = "SCORE:"+score;
+        textArray[1].text = "NIVEAU:"+level;
+        textArray[2].text = "VIES:"+lives;
+    
+        createShip(480);
+        
+        ennemiDisplay(positionInit);
+    
+    //*********************************************************************************************************//
+    //                            mise en place de la routine principale de gestion                            //
+    //*********************************************************************************************************//
+    
+        createjs.Ticker.setFPS(frameR);
+        createjs.Ticker.addEventListener("tick",tickFunc);
+}
+
+//------------------------------------------- gestion des touches ---------------------------------------------//
 function keyDown(event){
     let e = event.keyCode;
     console.log(e);
@@ -490,6 +549,8 @@ function keyUp(event){
     touche[e]=false;
 }
 
+//------------------------------------------- déplacements des aliens -----------------------------------------//
+
 function alienMove(){
 
     timerA += 1;
@@ -525,6 +586,8 @@ function alienMove(){
     }
 }
 
+//--------------------------------------------- tir du vaisseau -----------------------------------------------//
+
 function shootBul(x){
     if(shootShip){
         bullet = new createjs.Shape();
@@ -537,6 +600,8 @@ function shootBul(x){
     }
 }
 
+//-------------------------------------- déplacement du tir du vaisseau ---------------------------------------//
+
 function moveBul(){
     if(!shootShip){
         bullet.y -= speedBullet;
@@ -546,6 +611,8 @@ function moveBul(){
         }
     }
 }
+
+//---------------------------------------- tirs des vaisseaux aliens ------------------------------------------//
 
 function alienShootBul(xAlien,yAlien){
     const bulletAlien = new createjs.Shape();
@@ -557,6 +624,8 @@ function alienShootBul(xAlien,yAlien){
     shootAlien = true;
 }
 
+//--------------------------------------- déplacements des tirs aliens -----------------------------------------//
+
 function alienBulletMove(){
     if(shootAlien){
         for(let i=0; i<alienShootBullet.length; i++){
@@ -565,6 +634,8 @@ function alienBulletMove(){
     }
 
 }
+
+//---------------------------------------- apparition vaisseau mère --------------------------------------------//
 
 function spaceShipBuild(vaisseauMereSprite){
     if (!spaceShip){
@@ -579,6 +650,8 @@ function spaceShipBuild(vaisseauMereSprite){
     }
 }
 
+//----------------------------------------- déplacement vaisseau mère ------------------------------------------//
+
 function spaceShipMove(){
     if (spaceShip){
         flyingSocer.x -= speedSpace;
@@ -588,6 +661,8 @@ function spaceShipMove(){
         }
     }
 }
+
+//----------------------------------- calcul colision tirs du vaisseau -----------------------------------------//
 
 function colisions(){
     if (!shootShip){
@@ -635,6 +710,8 @@ function colisions(){
 
 }
 
+//----------------------------------------- création de la flotte alien ---------------------------------------//
+
 function ennemiDisplay(positionInit){
     for(let i=0; i<positionInit.length;i++){
         const spriteSheet=new createjs.SpriteSheet(positionInit[i].src);
@@ -649,6 +726,8 @@ function ennemiDisplay(positionInit){
     };
 }
 
+//-------------------------------- creation des textes de score, niveau, vies --------------------------------//
+
 function textDisplay(dataText,textLine,xData){
     dataText = new createjs.Text(textLine,"bold 20px Arial","black");
     dataText.textAlign="left";
@@ -659,11 +738,15 @@ function textDisplay(dataText,textLine,xData){
     textArray.push(dataText);
 }
 
+//----------------------------------------------- fin de jeu -------------------------------------------------//
+
 function gameOver(){
     music.pause();
     alert("Game Over");
     reset();
 }
+
+//------------------------------------------- remise à zero et restart ---------------------------------------//
 
 function reset(){
     console.log("reset");
@@ -703,15 +786,17 @@ function reset(){
     ennemiDisplay(positionInit);
 }
 
+//-------------------------------------- gestion des colisions de tirs aliens --------------------------------//
+
 function alienBulletColision(){
-    if(shootAlien){
+    if(shootAlien && shootAble){
         for(let i=0; i<alienShootBullet.length; i++){
             if((alienShootBullet[i].x>ship.x && alienShootBullet[i].x<ship.x+46) && alienShootBullet[i].y>ship.y){
                 lives -= 1;
                 textArray[2].text="VIES:"+lives;
                 waitTime();
                 stage.update();
-                if(lives === 0){
+                if(lives <= 0){
                     gameOver();
                 }
                 stage.removeChild(alienShootBullet[i]);
@@ -728,6 +813,8 @@ function alienBulletColision(){
 
 }
 
+//-------------------------------------- création tirs du vaisseau -------------------------------------------//
+
 function alienShoot(){
     alienArray.map((data)=>{
         let shoot = Math.floor(Math.random()*(shootSpeed/(56-alienArray.length)+200));
@@ -737,6 +824,8 @@ function alienShoot(){
 
     })
 }
+
+//----------------------- attente entre l'état de vaisseau touché et un pouveau vaisseau ----------------------//
 
 function waitTime(){
     shootAble = false;
@@ -748,6 +837,8 @@ function waitTime(){
     },2000);
 }
 
+//------------------------------------------ création du vaisseau ---------------------------------------------//
+
 function createShip(dataX){
     const spriteSheet = new createjs.SpriteSheet(vaisseauSprite);
     ship = new createjs.Sprite(spriteSheet,"stand");
@@ -757,6 +848,8 @@ function createShip(dataX){
     ship.scaleY = 0.7;
     stage.addChild(ship);
 }
+
+//--------------------------------- gestion des diverses fonctions par temporisation régulée -------------------//
 
 function tickFunc(){
     alienMove();
